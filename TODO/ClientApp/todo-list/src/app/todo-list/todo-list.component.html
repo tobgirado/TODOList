@@ -1,0 +1,11 @@
+<form [formGroup]="todoForm" (submit)="onSubmit()">
+  <mat-form-field class="">
+    <input matInput type="text" placeholder="Agregar todo" formControlName="description" />
+  </mat-form-field>
+</form>
+<mat-card layout-align="center center" flex>
+  <mat-selection-list #list>
+    <mat-list-option *ngFor="let todo of todoList" (click)="onClick(list)" [value]="todo">{{todo.description}}</mat-list-option>
+  </mat-selection-list>
+</mat-card>
+
