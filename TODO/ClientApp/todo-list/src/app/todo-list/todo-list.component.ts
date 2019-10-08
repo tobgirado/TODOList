@@ -5,6 +5,7 @@ import { Todo } from '../_models/todo';
 import { first } from 'rxjs/operators';
 
 import { TodoListService } from '../_services/todo-list.service';
+import { MatListOption } from '@angular/material/list';
 @Component({
   selector: 'app-todo-list',
   templateUrl: './todo-list.component.html',
@@ -15,7 +16,8 @@ export class TodoListComponent implements OnInit {
   todoForm: FormGroup;
   todoList: Todo[] = [];
   todoSelected: Todo;
-
+  toggle: boolean = false;
+  texto: string;
   constructor(
     private todolistService: TodoListService,
     private formBuilder: FormBuilder
@@ -25,12 +27,12 @@ export class TodoListComponent implements OnInit {
     this.todoForm = this.formBuilder.group({
       description: ['', Validators.required]
     });
-
+    this.texto = "Mostrar completados";
     this.listPending();
   }
 
   private listPending() {
-    this.todolistService.GetCompleted(false).pipe(first()).subscribe(todos => {
+    this.todolistService.GetCompleted(this.toggle).pipe(first()).subscribe(todos => {
       this.todoList = todos;
     });
   }
@@ -55,16 +57,20 @@ export class TodoListComponent implements OnInit {
         });
   }
 
-  onClick(list) {
-    this.todoSelected = list.selectedOptions.selected.map(item => item.value)[0];
-
-    this.todoSelected.completed = true;
-    console.log(this.todoSelected);
+  selectionChange(option: MatListOption) {
+    this.todoSelected = option.value;
+    this.todoSelected.completed = option.selected;
     this.todolistService.Put(this.todoSelected.id, this.todoSelected)
       .pipe(first())
       .subscribe(
         data => {
           this.listPending();
-        });;
+        });
+  }
+
+  doToggle(): void {
+    this.toggle = !this.toggle;
+    this.texto = this.toggle ? "Ocultar completados" : "Mostrar completados";
+    this.listPending();
   }
 }
